@@ -8,8 +8,8 @@ import { ColumnsModule } from './columns/columns.module';
 @Module({
   imports: [
     TasksModule,
-    MongooseModule.forRoot('mongodb://127.0.0.1:27017/gupitasks'),
-    ColumnsModule
+    MongooseModule.forRoot('mongodb+srv://admin:admin@cluster0.xdiex.mongodb.net/?retryWrites=true&w=majority'),
+    ColumnsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

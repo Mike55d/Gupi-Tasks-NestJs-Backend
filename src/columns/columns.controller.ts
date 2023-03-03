@@ -12,6 +12,11 @@ export class ColumnsController {
     return this.columnsService.create(createColumnDto);
   }
 
+  @Post('/changeOrder')
+  changeOrder(@Body() order: string[]) {
+    return this.columnsService.changeOrder(order);
+  }
+
   @Get()
   findAll() {
     return this.columnsService.findAll();

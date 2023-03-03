@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { ColumnsOrder, ColumnsOrderDocument } from 'src/columns/schema/columnOrder.schema';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Column, ColumnDocument } from './schema/column.schema';
@@ -11,7 +12,8 @@ export class TasksService {
   constructor(
     @InjectModel(Task.name) private taskModel: Model<TaskDocument>,
     @InjectModel(Column.name) private columnModel: Model<ColumnDocument>,
-  ) { }
+    @InjectModel(ColumnsOrder.name) private columnsOrderModel: Model<ColumnsOrderDocument>,
+    ) { }
 
   async create(request: { task: CreateTaskDto, columnId: string }) {
 
@@ -25,9 +27,10 @@ export class TasksService {
   }
 
   async findAll() {
-    const allTasks = await this.taskModel.find();
-    const allColumns = await this.columnModel.find();
-    const taskColumns = { tasks: allTasks, columns: allColumns }
+    const tasks = await this.taskModel.find();
+    const columns = await this.columnModel.find();
+    const orderColumns = await this.columnsOrderModel.findOne();
+    const taskColumns = { tasks, columns, orderColumns:orderColumns.columnsOrder }
     return taskColumns;
   }
 
