@@ -8,5 +8,5 @@ export class Column {
     title: string
 
     @ColumnType('simple-array')
-    taskIds: number []
+    taskIds: string []
 }

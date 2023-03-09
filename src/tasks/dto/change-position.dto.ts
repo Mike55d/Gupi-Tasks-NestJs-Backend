@@ -7,8 +7,8 @@ export class ChangeOrderDto {
     @Transform(({ value }) => parseInt(value.split('-')[1]))
     columnId: number;
     @IsArray()
-    @Transform(({ value }) => Array.isArray(value) ? value.map(id => parseInt(id.split('-')[1])) : null)
-    newTaskIds: number[];
+    @Transform(({ value }) => Array.isArray(value) ? value.map(id => id.split('-')[1]) : null)
+    newTaskIds: string[];
 }
 
 export class ChangeColumnDto {

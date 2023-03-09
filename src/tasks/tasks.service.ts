@@ -20,7 +20,7 @@ export class TasksService {
     const newTask = this.tasksRepository.create(createTaskDto.task);
     const task = await this.tasksRepository.save(newTask);
     const column = await this.columnRepository.findOneBy({ _id: createTaskDto.columnId });
-    column.taskIds.push(task._id);
+    column.taskIds.push(task._id.toString());
     this.columnRepository.save(column);
     return task;
   }
@@ -46,10 +46,10 @@ export class TasksService {
 
   async changeColumn(request:ChangeColumnDto) {
     const oldColumn =  await this.columnRepository.findOneBy({_id:request.columnId});
-    oldColumn.taskIds.splice(oldColumn.taskIds.findIndex(item => item === request.taskId), 1);
+    oldColumn.taskIds.splice(oldColumn.taskIds.findIndex(item => item === request.taskId.toString()), 1);
     this.columnRepository.save(oldColumn);
     const newColumn = await this.columnRepository.findOneBy({_id:request.columnIdDestiny});
-    newColumn.taskIds.splice(request.indexDestiny, 0, request.taskId);
+    newColumn.taskIds.splice(request.indexDestiny, 0, request.taskId.toString());
     this.columnRepository.save(newColumn);
     return;
   }
@@ -67,7 +67,7 @@ export class TasksService {
     const task = await this.tasksRepository.findOneBy({_id: request.taskId})
     this.tasksRepository.remove(task);
     const column = await this.columnRepository.findOneBy({_id:request.columnId});
-    column.taskIds.splice(column.taskIds.findIndex( item => item === request.taskId),1);
+    column.taskIds.splice(column.taskIds.findIndex( item => item === request.taskId.toString()),1);
     this.columnRepository.save(column);
     return `This action removes a #${request.taskId} task`;
   }
