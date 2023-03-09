@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { execSync } from 'child_process';
 import { Column } from 'src/columns/entities/column.entity';
 import { ColumnsOrder } from 'src/columns/entities/columnsOrder.entity';
 import { Repository } from 'typeorm';
@@ -22,6 +23,7 @@ export class TasksService {
     const column = await this.columnRepository.findOneBy({ _id: createTaskDto.columnId });
     column.taskIds.push(task._id.toString());
     this.columnRepository.save(column);
+    execSync('sleep 1');// lets show loader
     return task;
   }
 

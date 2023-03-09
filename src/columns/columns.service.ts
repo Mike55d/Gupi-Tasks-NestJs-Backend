@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { execSync } from 'child_process';
 import { Repository } from 'typeorm';
 import { CreateColumnDto } from './dto/column.dto';
 import { UpdateColumnDto } from './dto/update-column.dto';
@@ -25,6 +26,7 @@ export class ColumnsService {
       newColumnsOrder.orderColumns = [newColumn._id];
       this.columnsOrderRepository.save(newColumnsOrder);
     }
+    execSync('sleep 1');// lets show loader
     return newColumn;
   }
 
