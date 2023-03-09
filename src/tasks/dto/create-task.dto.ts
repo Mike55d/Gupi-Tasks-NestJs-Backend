@@ -1,5 +1,7 @@
 export class CreateTaskDto {
-    title:string;
-    content:string;
-    columnId:number;
+    task:{
+        title:string;
+        content:string;
+    }
+    columnId:string;
 }

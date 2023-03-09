@@ -4,21 +4,32 @@ import { Repository } from 'typeorm';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { UpdateColumnDto } from './dto/update-column.dto';
 import { Column } from './entities/column.entity';
+import { ColumnsOrder } from './entities/columnsOrder.entity';
 
 @Injectable()
 export class ColumnsService {
   constructor(
-    @InjectRepository(Column)
-    private tasksRepository: Repository<Column>,
+    @InjectRepository(Column) private tasksRepository: Repository<Column>,
+    @InjectRepository(ColumnsOrder) private columnsOrderRepository: Repository<ColumnsOrder>,
   ) { }
 
-  create(createColumnDto: CreateColumnDto) {
+  async create(createColumnDto: CreateColumnDto) {
     const column = this.tasksRepository.create(createColumnDto);
-    return this.tasksRepository.save(column);
+    const newColumn = await this.tasksRepository.save(column)
+    const columnsOrder = await this.columnsOrderRepository.findOne({where:{}});
+    if(columnsOrder){
+      columnsOrder.orderColumns.push(newColumn._id);
+      this.columnsOrderRepository.save(columnsOrder);
+    }else{
+      const newColumnsOrder = new ColumnsOrder();
+      newColumnsOrder.orderColumns = [newColumn._id];
+      this.columnsOrderRepository.save(newColumnsOrder);
+    }
+    return newColumn;
   }
 
   async findAll() {
-    return this.tasksRepository.find();
+    return `this action return all columns`;
   }
 
   findOne(id: number) {

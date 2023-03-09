@@ -4,9 +4,10 @@ import { TasksController } from './tasks.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Task } from './entities/task.entity';
 import { Column } from 'src/columns/entities/column.entity';
+import { ColumnsOrder } from 'src/columns/entities/columnsOrder.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Task,Column])],
+  imports: [TypeOrmModule.forFeature([Task,Column,ColumnsOrder])],
   controllers: [TasksController],
   providers: [TasksService]
 })
