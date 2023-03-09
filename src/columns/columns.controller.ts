@@ -12,6 +12,11 @@ export class ColumnsController {
     return this.columnsService.create(createColumnDto);
   }
 
+  @Post('/changeOrder')
+  changeOrder(@Body() order: string[]) {
+    return this.columnsService.changeOrder(order);
+  }
+
   @Get()
   findAll() {
     return this.columnsService.findAll();
@@ -29,6 +34,6 @@ export class ColumnsController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.columnsService.remove(+id);
+    return this.columnsService.remove(id);
   }
 }

@@ -18,7 +18,7 @@ export class TasksService {
   async create(createTaskDto: CreateTaskDto) {
     const newTask = this.tasksRepository.create(createTaskDto.task);
     const task = await this.tasksRepository.save(newTask);
-    const idColumn = parseInt(createTaskDto.columnId.split('-')[1])
+    const idColumn = parseInt(createTaskDto.columnId.split('-')[1]);
     const column = await this.columnRepository.findOneBy({ _id: idColumn });
     column.taskIds.push(task._id);
     this.columnRepository.save(column);
@@ -37,6 +37,29 @@ export class TasksService {
     return taskColumns;
   }
 
+  async changeOrder(request) {
+    const idColumn = parseInt(request.columnId.split('-')[1]);
+    const parsedTaskIds = request.newTaskIds.map(id => parseInt(id.split('-')[1]));
+    const column = await this.columnRepository.findOneBy({_id:idColumn});
+    column.taskIds = parsedTaskIds;
+    this.columnRepository.save(column);
+    return column;
+  }
+
+  async changeColumn(request) {
+    const taskId = parseInt(request.taskId.split('-')[1]);
+    const idColumn = parseInt(request.columnId.split('-')[1]);
+    const idColumnDestiny = parseInt(request.columnIdDestiny.split('-')[1]);
+    const oldColumn =  await this.columnRepository.findOneBy({_id:idColumn});
+    oldColumn.taskIds.splice(oldColumn.taskIds.findIndex(item => item === taskId), 1);
+    this.columnRepository.save(oldColumn);
+    const newColumn = await this.columnRepository.findOneBy({_id:idColumnDestiny});
+    newColumn.taskIds.splice(request.indexDestiny, 0, taskId);
+    this.columnRepository.save(newColumn);
+    return;
+  }
+
+
   findOne(id: number) {
     return `This action returns a #${id} task`;
   }
@@ -45,7 +68,14 @@ export class TasksService {
     return `This action updates a #${id} task`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} task`;
+  async remove(request: { taskId: string, columnId: string }) {
+    const idTask = parseInt(request.taskId.split('-')[1]);
+    const idColumn = parseInt(request.columnId.split('-')[1]);
+    const task = await this.tasksRepository.findOneBy({_id: idTask})
+    this.tasksRepository.remove(task);
+    const column = await this.columnRepository.findOneBy({_id:idColumn});
+    column.taskIds.splice(column.taskIds.findIndex( item => item === idTask),1);
+    this.columnRepository.save(column);
+    return `This action removes a #${request.taskId} task`;
   }
 }
