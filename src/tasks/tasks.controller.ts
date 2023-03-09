@@ -1,11 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { CreateTaskDto } from './dto/create-task.dto';
+import { CreateTaskDto, DeleteTaskDto } from './dto/task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { ChangeColumnDto, ChangeOrderDto } from './dto/change-position.dto';
 
 @Controller('tasks')
 export class TasksController {
-  constructor(private readonly tasksService: TasksService) {}
+  constructor(private readonly tasksService: TasksService) { }
 
   @Post()
   create(@Body() createTaskDto: CreateTaskDto) {
@@ -28,17 +29,17 @@ export class TasksController {
   }
 
   @Delete()
-  remove(@Body() request: { taskId: string, columnId: string }) {
+  remove(@Body() request: DeleteTaskDto) {
     return this.tasksService.remove(request);
   }
-  
+
   @Post('/changeOrder')
-  changeOrder(@Body() request) {
+  changeOrder(@Body() request: ChangeOrderDto) {
     return this.tasksService.changeOrder(request);
   }
 
   @Post('/changeColumn')
-  changeColumn(@Body() request) {
+  changeColumn(@Body() request: ChangeColumnDto) {
     return this.tasksService.changeColumn(request);
   }
 }

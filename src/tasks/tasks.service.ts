@@ -3,7 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Column } from 'src/columns/entities/column.entity';
 import { ColumnsOrder } from 'src/columns/entities/columnsOrder.entity';
 import { Repository } from 'typeorm';
-import { CreateTaskDto } from './dto/create-task.dto';
+import { ChangeColumnDto, ChangeOrderDto } from './dto/change-position.dto';
+import { CreateTaskDto, DeleteTaskDto } from './dto/task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './entities/task.entity';
 
@@ -18,8 +19,7 @@ export class TasksService {
   async create(createTaskDto: CreateTaskDto) {
     const newTask = this.tasksRepository.create(createTaskDto.task);
     const task = await this.tasksRepository.save(newTask);
-    const idColumn = parseInt(createTaskDto.columnId.split('-')[1]);
-    const column = await this.columnRepository.findOneBy({ _id: idColumn });
+    const column = await this.columnRepository.findOneBy({ _id: createTaskDto.columnId });
     column.taskIds.push(task._id);
     this.columnRepository.save(column);
     return task;
@@ -37,24 +37,19 @@ export class TasksService {
     return taskColumns;
   }
 
-  async changeOrder(request) {
-    const idColumn = parseInt(request.columnId.split('-')[1]);
-    const parsedTaskIds = request.newTaskIds.map(id => parseInt(id.split('-')[1]));
-    const column = await this.columnRepository.findOneBy({_id:idColumn});
-    column.taskIds = parsedTaskIds;
+  async changeOrder(request:ChangeOrderDto) {
+    const column = await this.columnRepository.findOneBy({_id:request.columnId});
+    column.taskIds = request.newTaskIds;
     this.columnRepository.save(column);
     return column;
   }
 
-  async changeColumn(request) {
-    const taskId = parseInt(request.taskId.split('-')[1]);
-    const idColumn = parseInt(request.columnId.split('-')[1]);
-    const idColumnDestiny = parseInt(request.columnIdDestiny.split('-')[1]);
-    const oldColumn =  await this.columnRepository.findOneBy({_id:idColumn});
-    oldColumn.taskIds.splice(oldColumn.taskIds.findIndex(item => item === taskId), 1);
+  async changeColumn(request:ChangeColumnDto) {
+    const oldColumn =  await this.columnRepository.findOneBy({_id:request.columnId});
+    oldColumn.taskIds.splice(oldColumn.taskIds.findIndex(item => item === request.taskId), 1);
     this.columnRepository.save(oldColumn);
-    const newColumn = await this.columnRepository.findOneBy({_id:idColumnDestiny});
-    newColumn.taskIds.splice(request.indexDestiny, 0, taskId);
+    const newColumn = await this.columnRepository.findOneBy({_id:request.columnIdDestiny});
+    newColumn.taskIds.splice(request.indexDestiny, 0, request.taskId);
     this.columnRepository.save(newColumn);
     return;
   }
@@ -68,13 +63,11 @@ export class TasksService {
     return `This action updates a #${id} task`;
   }
 
-  async remove(request: { taskId: string, columnId: string }) {
-    const idTask = parseInt(request.taskId.split('-')[1]);
-    const idColumn = parseInt(request.columnId.split('-')[1]);
-    const task = await this.tasksRepository.findOneBy({_id: idTask})
+  async remove(request: DeleteTaskDto) {
+    const task = await this.tasksRepository.findOneBy({_id: request.taskId})
     this.tasksRepository.remove(task);
-    const column = await this.columnRepository.findOneBy({_id:idColumn});
-    column.taskIds.splice(column.taskIds.findIndex( item => item === idTask),1);
+    const column = await this.columnRepository.findOneBy({_id:request.columnId});
+    column.taskIds.splice(column.taskIds.findIndex( item => item === request.taskId),1);
     this.columnRepository.save(column);
     return `This action removes a #${request.taskId} task`;
   }

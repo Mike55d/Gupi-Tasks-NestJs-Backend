@@ -1,3 +1,4 @@
+import { Exclude } from "class-transformer";
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 @Entity()
 export class Task {
@@ -8,5 +9,6 @@ export class Task {
     title: string
 
     @Column()
+    @Exclude()
     content: string
 }
