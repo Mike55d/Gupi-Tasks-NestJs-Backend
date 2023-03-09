@@ -3,13 +3,13 @@ import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 
-@Controller('tasks')
+@Controller('mongo/tasks')
 export class TasksController {
-  constructor(private readonly tasksService: TasksService) {}
+  constructor(private readonly tasksService: TasksService) { }
 
   @Post()
-  create(@Body() createTaskDto: CreateTaskDto) {
-    return this.tasksService.create(createTaskDto);
+  create(@Body() request: { task: CreateTaskDto, columnId: string }) {
+    return this.tasksService.create(request);
   }
 
   @Get()
@@ -27,8 +27,18 @@ export class TasksController {
     return this.tasksService.update(+id, updateTaskDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tasksService.remove(+id);
+  @Delete()
+  remove(@Body() request: { taskId: string, columnId: string }) {
+    return this.tasksService.remove(request);
+  }
+
+  @Post('/changeOrder')
+  changeOrder(@Body() request) {
+    return this.tasksService.changeOrder(request);
+  }
+
+  @Post('/changeColumn')
+  changeColumn(@Body() request) {
+    return this.tasksService.changeColumn(request);
   }
 }
