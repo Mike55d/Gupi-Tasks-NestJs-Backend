@@ -35,7 +35,7 @@ export class TasksService {
       taskIds: column.taskIds.map(id => `t-${id}`)
     }));
     const columnsOrder = (await this.columnsOrderRepository.findOne({ where: {} }))
-    const taskColumns = { tasks, columns, orderColumns: columnsOrder.orderColumns.map(id => `c-${id}`) };
+    const taskColumns = { tasks, columns, orderColumns: columnsOrder ? columnsOrder.orderColumns.map(id => `c-${id}`) : [] };
     return taskColumns;
   }
 
